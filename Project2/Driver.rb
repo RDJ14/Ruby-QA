@@ -41,6 +41,7 @@ class Driver
   attr_accessor :num_dino
   attr_accessor :num_books
   attr_accessor :current_coords
+  attr_accessor :current_location
 
   def setStart(starting_location)
       if(starting_location == 1)

@@ -34,7 +34,6 @@ class TestDriver < Minitest::Test
 
   #If a valid location is not passed in, then the drivers location should be left blank
   def test_undefined_location
-
       driver = Driver.new("TestDriver")
 
       driver.setStart(-1)
@@ -163,7 +162,11 @@ class TestDriver < Minitest::Test
 
   def test_display_of_defined_location_horizontal
     driver = Driver.new("TestDriver")
-    driver.setStart(4) #Hospital
+    cd = Minitest::Mock.new
+    def cd.y; 0; end
+    def cd.x; 1; end
+    driver.current_coords = cd
+    driver.current_location = Driver::HOSP_CONST
     correctRoute = "TestDriver heading from Hospital to Cathedral via Fourth Ave."
 
     route = driver.displayRoute(Driver::CATHY_CONST, true)
@@ -173,7 +176,12 @@ class TestDriver < Minitest::Test
 
   def test_display_of_defined_location_vertical
     driver = Driver.new("TestDriver")
-    driver.setStart(4) #Hospital
+    cd = Minitest::Mock.new
+
+    def cd.y; 0; end
+    def cd.x; 1; end
+    driver.current_coords = cd
+    driver.current_location = Driver::HOSP_CONST
     correctRoute = "TestDriver heading from Hospital to Hillman via Foo St."
 
     route = driver.displayRoute(Driver::HILL_CONST, false)
@@ -227,6 +235,5 @@ class TestDriver < Minitest::Test
 
     assert_equal 3, driver.num_books
   end
-
 
 end
