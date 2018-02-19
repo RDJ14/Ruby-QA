@@ -12,7 +12,6 @@ end
 
 seed = Seed.new()
 rand_seed = seed.getSeedValue(input_array);
-puts "Seed : #{rand_seed}"
 prng = Random.new(rand_seed)
 
 for i in 1..5 do
