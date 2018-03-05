@@ -30,8 +30,14 @@ if(startingBlockOK != true)
   exit!
 end
 
+# Print out addresses and their billcoins if the chain is valid
+hashMap = verify_rest_of_chain(blockArray)
 
+# Make sure hashMap is a valid hash
+raise "Could not verify blockchain" unless hashMap.is_a? Hash
 
+# Print output
+Blocks.print(hashMap)
 
 
 exit!

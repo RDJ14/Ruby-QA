@@ -80,7 +80,7 @@ class Vericator
 			break unless buffer.chomp!(":") != nil
 		  end
 	  }
-	  return true
+	  return hashMap
   end
 
   def create_block someBlock

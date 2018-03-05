@@ -18,8 +18,8 @@ class Block
     @endHash = endHash
   end
   
-  def print blockArray
-    # TODO implement printing
+  def print hashMap
+	  hashMap.each{ |address, coins| puts "#{address}: #{coins} billcoins"}
   end
 
 
