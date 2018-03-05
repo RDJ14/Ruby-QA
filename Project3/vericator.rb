@@ -45,6 +45,20 @@ class Vericator
     end
   end
 
+  def verify_rest_of_chain blockAr
+	  blockAr.each_with_index { |blk, idx| break if idx + 1 == blockAr.length # Don't overrun array
+		  # Check if our endHash == next block's previousHash
+		  # If there's a hash mismatch, raise an exception
+		  if blk[idx].endHash != blk[idx + 1].previousHash
+			  raise "Block #{idx + 1}'s previous hash (#{blk[idx + 1].previousHash}) does not " + 
+				  "match block #{idx}'s end hash (#{blk[idx].endHash})"
+		  end
+	  
+	  	  # Check if the transaction itself is valid
+	  }
+	  return true
+  end
+
   def create_block someBlock
     if(someBlock.length != 5)
       return nil

@@ -17,6 +17,11 @@ class Block
     @timeStamp = timeStamp
     @endHash = endHash
   end
+  
+  def print blockArray
+    # TODO implement printing
+  end
+
 
   attr_reader :blockNumber
   attr_reader :previousHash
