@@ -17,11 +17,6 @@ class Block
     @timeStamp = timeStamp
     @endHash = endHash
   end
-  
-  def print hashMap
-	  hashMap.each{ |address, coins| puts "#{address}: #{coins} billcoins"}
-  end
-
 
   attr_reader :blockNumber
   attr_reader :previousHash

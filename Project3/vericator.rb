@@ -45,36 +45,43 @@ class Vericator
     end
   end
 
-  def verify_rest_of_chain blockAr
-	  blockAr.each_with_index { |blk, idx| break if idx + 1 == blockAr.length # Don't overrun array
+  def verify_rest_of_chain blockArray
+
+	  hashMap = Hash.new
+
+	  blockArray.each_with_index { |blk, idx| break if idx + 1 == blockArray.length # Don't overrun array
+		  
 		  # Check if our endHash == next block's previousHash
 		  # If there's a hash mismatch, raise an exception
-		  if blk[idx].endHash != blk[idx + 1].previousHash
-			  raise "Block #{idx + 1}'s previous hash (#{blk[idx + 1].previousHash}) does not " + 
-				  "match block #{idx}'s end hash (#{blk[idx].endHash})"
+		  # Hacky newline removal
+		  blk.endHash.delete!("\n")
+		  blockArray[idx + 1].previousHash.delete!("\n")
+
+		  unless blk.endHash.eql?(blockArray[idx + 1].previousHash)
+			  raise "Block #{idx + 1}'s previous hash<#{blockArray[idx + 1].previousHash}> does not " + 
+				  "match block #{idx}'s end hash:<#{blk.endHash}>"
 		  end
 	  
 		  # Check for valid transaction amounts
-		  buffer = blockAr[idx].transactions
-		  while not buffer.isEmpty?
-			giver = buffer.chomp!(">")
-			taker = buffer.chomp!("(")
+		  buffer = blockArray[idx].transactions
+		  while not buffer.empty?
+			sender = buffer.chomp!(">")
+			reciever = buffer.chomp!("(")
 			amount = buffer.chomp!(")").to_i
-
 			# Check transaction format
-			raise "Invalid Billcoin giver: #{giver}" if giver.to_s == nil
-			raise "Invalid Billcoin taker: #{taker}" if taker.to_s == nil
-			raise "Invalid Billcoin amount: #{amount}" if giver.to_i == nil
+			raise "Billcoin sender is nil in block #{idx}" if sender.nil?
+			raise "Billcoin reciever is nil in block #{idx}" if reciever.nil?
+			raise "Billcoin amount is nil in block #{idx}: #{amount}" if amount.nil?
 
-			if (not giver.eql? "SYSTEM") &&  (hashMap[giver] - amount < 0)
-				# Check if the giver has enough coins for the transaction
+			if (not sender.eql? "SYSTEM") &&  (hashMap[sender].to_i - amount < 0)
+				# Check if the sender has enough coins for the transaction
 				# unless its the system
-				raise "#{giver} does not have enough Billcoins for this transaction"
+				raise "#{sender} does not have enough Billcoins for this transaction"
 			end
 			# Unless the system is giving billcoins, subtract the amount from
-			# the giver's wallet
-			hashMap[giver] = hashMap[giver] - amount unless giver.eql? "SYSTEM"
-			hashMap[taker] = hashMap[taker] + amount
+			# the sender's wallet
+			hashMap[sender] = hashMap[sender].to_i - amount unless sender.eql? "SYSTEM"
+			hashMap[reciever] = hashMap[reciever].to_i + amount
 
 			# Break if there aren't more transactions
 			break unless buffer.chomp!(":") != nil

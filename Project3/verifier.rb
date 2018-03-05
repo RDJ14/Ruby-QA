@@ -1,6 +1,10 @@
 require_relative "Block"
 require_relative "vericator"
 
+def print hashMap
+  hashMap.each{ |address, coins| puts "#{address}: #{coins} billcoins"}
+end
+
 #Main
 veri = Vericator.new()
 
@@ -31,13 +35,13 @@ if(startingBlockOK != true)
 end
 
 # Print out addresses and their billcoins if the chain is valid
-hashMap = verify_rest_of_chain(blockArray)
+hashMap = veri.verify_rest_of_chain(blockArray)
 
 # Make sure hashMap is a valid hash
 raise "Could not verify blockchain" unless hashMap.is_a? Hash
 
 # Print output
-Blocks.print(hashMap)
+print(hashMap)
 
 
 exit!
