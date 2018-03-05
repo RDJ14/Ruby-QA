@@ -63,29 +63,32 @@ class Vericator
 		  end
 	  
 		  # Check for valid transaction amounts
-		  buffer = blockArray[idx].transactions
-		  while not buffer.empty?
-			sender = buffer.chomp!(">")
-			reciever = buffer.chomp!("(")
-			amount = buffer.chomp!(")").to_i
+		  transactions = blockArray[idx].transactions.split(":") # Split by transaction
+		  transactions.each { |thisTransaction| # work on each transaction
+			sender = thisTransaction.slice(/.*>/) # Isolate sender's name
+			sender.delete! ">" # Remove the ">"
+			reciever = thisTransaction.slice(/>.*\(/) # Isolate to ">receiver("
+			reciever.delete! "(" # Got rid of "("
+			reciever.delete! ">" # Got rid of ">"
+			amount = thisTransaction.slice(/\(.*\)/) # Isolated to "(amount)"
+			reciever.delete! "("
+			reciever.delete! ")"
 			# Check transaction format
 			raise "Billcoin sender is nil in block #{idx}" if sender.nil?
 			raise "Billcoin reciever is nil in block #{idx}" if reciever.nil?
 			raise "Billcoin amount is nil in block #{idx}: #{amount}" if amount.nil?
 
-			if (not sender.eql? "SYSTEM") &&  (hashMap[sender].to_i - amount < 0)
+			if (not sender.eql? "SYSTEM") &&  (hashMap[sender].to_i - amount.to_i < 0)
 				# Check if the sender has enough coins for the transaction
 				# unless its the system
 				raise "#{sender} does not have enough Billcoins for this transaction"
 			end
 			# Unless the system is giving billcoins, subtract the amount from
 			# the sender's wallet
-			hashMap[sender] = hashMap[sender].to_i - amount unless sender.eql? "SYSTEM"
-			hashMap[reciever] = hashMap[reciever].to_i + amount
+			hashMap[sender] = hashMap[sender].to_i - amount.to_i unless sender.eql? "SYSTEM"
+			hashMap[reciever] = hashMap[reciever].to_i + amount.to_i
 
-			# Break if there aren't more transactions
-			break unless buffer.chomp!(":") != nil
-		  end
+		  }
 	  }
 	  return hashMap
   end
