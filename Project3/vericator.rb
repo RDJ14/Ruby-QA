@@ -71,8 +71,8 @@ class Vericator
 			reciever.delete! "(" # Got rid of "("
 			reciever.delete! ">" # Got rid of ">"
 			amount = thisTransaction.slice(/\(.*\)/) # Isolated to "(amount)"
-			reciever.delete! "("
-			reciever.delete! ")"
+			amount.delete! "("
+			amount.delete! ")"
 			# Check transaction format
 			raise "Billcoin sender is nil in block #{idx}" if sender.nil?
 			raise "Billcoin reciever is nil in block #{idx}" if reciever.nil?
