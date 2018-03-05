@@ -54,7 +54,31 @@ class Vericator
 				  "match block #{idx}'s end hash (#{blk[idx].endHash})"
 		  end
 	  
-	  	  # Check if the transaction itself is valid
+		  # Check for valid transaction amounts
+		  buffer = blockAr[idx].transactions
+		  while not buffer.isEmpty?
+			giver = buffer.chomp!(">")
+			taker = buffer.chomp!("(")
+			amount = buffer.chomp!(")").to_i
+
+			# Check transaction format
+			raise "Invalid Billcoin giver: #{giver}" if giver.to_s == nil
+			raise "Invalid Billcoin taker: #{taker}" if taker.to_s == nil
+			raise "Invalid Billcoin amount: #{amount}" if giver.to_i == nil
+
+			if (not giver.eql? "SYSTEM") &&  (hashMap[giver] - amount < 0)
+				# Check if the giver has enough coins for the transaction
+				# unless its the system
+				raise "#{giver} does not have enough Billcoins for this transaction"
+			end
+			# Unless the system is giving billcoins, subtract the amount from
+			# the giver's wallet
+			hashMap[giver] = hashMap[giver] - amount unless giver.eql? "SYSTEM"
+			hashMap[taker] = hashMap[taker] + amount
+
+			# Break if there aren't more transactions
+			break unless buffer.chomp!(":") != nil
+		  end
 	  }
 	  return true
   end
