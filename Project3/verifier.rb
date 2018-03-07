@@ -34,14 +34,19 @@ if(startingBlockOK != true)
   exit!
 end
 
-# Print out addresses and their billcoins if the chain is valid
-hashMap = veri.verify_rest_of_chain(blockArray)
+# Make sure blocks are in right order
+veri.verify_order blockArray 
+
+# Make sure previous hashes match end hashes
+veri.verify_hashes blockArray 
+
+# Verify that wallets are not overdrawn
+hashMap = veri.verify_wallet_amounts blockArray
 
 # Make sure hashMap is a valid hash
 raise "Could not verify blockchain" unless hashMap.is_a? Hash
 
 # Print output
 print(hashMap)
-
 
 exit!

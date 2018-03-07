@@ -45,12 +45,10 @@ class Vericator
     end
   end
 
-  def verify_rest_of_chain blockArray
+  def verify_hashes blockArray
 
-	  hashMap = Hash.new
-
-	  blockArray.each_with_index { |blk, idx| break if idx + 1 == blockArray.length # Don't overrun array
-		  
+	  # idx + 1 so we don't overrun array
+	  blockArray.each_with_index { |blk, idx| break if idx + 1 == blockArray.length 
 		  # Check if our endHash == next block's previousHash
 		  # If there's a hash mismatch, raise an exception
 		  # Hacky newline removal
@@ -61,11 +59,22 @@ class Vericator
 			  raise "Block #{idx + 1}'s previous hash<#{blockArray[idx + 1].previousHash}> does not " + 
 				  "match block #{idx}'s end hash:<#{blk.endHash}>"
 		  end
-	  
+	  }
+
+	  return true
+  end
+  def verify_wallet_amounts blockArray
+
+	  hashMap = Hash.new
+	
+	  # idx + 1 so we don't overrun array
+	  blockArray.each_with_index { |blk, idx| break if idx + 1 == blockArray.length 
+		  
 		  # Check for valid transaction amounts
 		  transactions = blockArray[idx].transactions.split(":") # Split by transaction
 		  transactions.each { |thisTransaction| # work on each transaction
-			sender = thisTransaction.slice(/.*>/) # Isolate sender's name
+			
+		  	sender = thisTransaction.slice(/.*>/) # Isolate sender's name
 			sender.delete! ">" # Remove the ">"
 			reciever = thisTransaction.slice(/>.*\(/) # Isolate to ">receiver("
 			reciever.delete! "(" # Got rid of "("
@@ -88,9 +97,19 @@ class Vericator
 			hashMap[sender] = hashMap[sender].to_i - amount.to_i unless sender.eql? "SYSTEM"
 			hashMap[reciever] = hashMap[reciever].to_i + amount.to_i
 
-		  }
-	  }
+		  } # end of transactions.each
+	  } # end of blockArray.each_with_index
 	  return hashMap
+  end
+
+  def verify_order blockArray
+		blockArray.each_with_index { |blk, idx| 
+	  	unless blk.blockNumber.to_i.eql? idx
+			raise "Block #{blk.blockNumber} is out of order, expected #{idx}"
+		end
+			# Block numbers should be 0..lastBlockNumber
+		}
+	return true
   end
 
   def create_block someBlock
