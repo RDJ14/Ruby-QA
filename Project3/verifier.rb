@@ -35,16 +35,20 @@ if(startingBlockOK != true)
 end
 
 # Make sure blocks are in right order
-veri.verify_order blockArray 
+abort "BLOCKCHAIN INVALID" unless veri.verify_order blockArray 
 
 # Make sure previous hashes match end hashes
-veri.verify_hashes blockArray 
+abort "BLOCKCHAIN INVALID" unless veri.verify_hashes blockArray 
+
+# Check that timestamps are valid
+abort "BLOCKCHAIN INVALID" unless veri.verify_time blockArray 
 
 # Verify that wallets are not overdrawn
 hashMap = veri.verify_wallet_amounts blockArray
+abort "BLOCKCHAIN INVALID" if hashMap.nil?
 
 # Make sure hashMap is a valid hash
-raise "Could not verify blockchain" unless hashMap.is_a? Hash
+abort "BLOCKCHAIN INVALID" unless hashMap.is_a? Hash
 
 # Print output
 print(hashMap)
