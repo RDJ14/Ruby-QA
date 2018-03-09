@@ -8,6 +8,9 @@ def print hashMap
 end
 
 #Main
+
+Flamegraph.generate('verifier.html') do
+
 veri = Vericator.new()
 
 inputArray = ARGV
@@ -57,5 +60,7 @@ abort "BLOCKCHAIN INVALID" unless veri.verify_hash_value blockArray
 
 # Print output
 print(hashMap)
+
+end # End of flamegraph generation
 
 exit!
