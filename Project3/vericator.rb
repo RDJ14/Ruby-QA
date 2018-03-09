@@ -47,7 +47,7 @@ class Vericator
 
   def verify_hashes blockArray
 	  # idx + 1 so we don't overrun array
-	  blockArray.each_with_index { |blk, idx| break if idx + 1 == blockArray.length 
+	  blockArray.each_with_index { |blk, idx| break if idx + 1 == blockArray.length
 		  # Check if our endHash == next block's previousHash
 		  # If there's a hash mismatch, raise an exception
 		  # Hacky newline removal
@@ -55,24 +55,25 @@ class Vericator
 		  blockArray[idx + 1].previousHash.delete!("\n")
 
 		  unless blk.endHash.eql?(blockArray[idx + 1].previousHash)
-			  puts "Block #{idx + 1}'s previous hash<#{blockArray[idx + 1].previousHash}> does not " + 
+			  puts "Block #{idx + 1}'s previous hash<#{blockArray[idx + 1].previousHash}> does not " +
 				  "match block #{idx}'s end hash:<#{blk.endHash}>"
 			  return nil
 		  end
 	  }
 	  return true
   end
+
   def verify_wallet_amounts blockArray
 
 	  hashMap = Hash.new
-	
+
 	  # idx + 1 so we don't overrun array
-	  blockArray.each_with_index { |blk, idx| break if idx + 1 == blockArray.length 
-		  
+	  blockArray.each_with_index { |blk, idx| break if idx + 1 == blockArray.length
+
 		  # Check for valid transaction amounts
 		  transactions = blockArray[idx].transactions.split(":") # Split by transaction
 		  transactions.each { |thisTransaction| # work on each transaction
-			
+
 		  	sender = thisTransaction.slice(/.*>/) # Isolate sender's name
 			sender.delete! ">" # Remove the ">"
 			reciever = thisTransaction.slice(/>.*\(/) # Isolate to ">receiver("
@@ -103,7 +104,7 @@ class Vericator
   end
 
   def verify_order blockArray
-	blockArray.each_with_index { |blk, idx| 
+	blockArray.each_with_index { |blk, idx|
 	unless blk.blockNumber.to_i.eql? idx
 		puts "Block #{blk.blockNumber} is out of order, expected #{idx}"
 		return false
@@ -117,23 +118,63 @@ class Vericator
 	  blockArray.each_with_index { |blk, idx| break if idx + 1 == blockArray.length
 		# Get seconds
 		nextBlk = blockArray[idx + 1]
-		seconds = blk.timeStamp.slice(".")
+		seconds = blk.timeStamp.slice(/.+?(?=\.)/)
 		seconds.delete! "." # Get rid of "."
-		next_blk_seconds = nextBlk.timeStamp.slice(".")
+		next_blk_seconds = nextBlk.timeStamp.slice(/.+?(?=\.)/)
 		next_blk_seconds.delete! "." # Get rid of "."
 		# Get nanoseconds
 		nanoseconds = blk.timeStamp.slice(/\..*$/) # from . to end of the line
 		nanoseconds.delete! "." # Get rid of "."
-		next_blk_ns = nextBlk.timeStamp.slice(".")
+		next_blk_ns = nextBlk.timeStamp.slice(/\..*$/)
 		next_blk_ns.delete! "." # Get rid of "."
 		# Test seconds
-		return true if seconds < next_blk_seconds 
-		# Same amount of seconds so test nanoseconds
-		return true if seconds.eql? next_blk_seconds and nanoseconds < next_blk_ns 
-		# Otherwise, there is a time error
-		puts "Current timestamp:#{blk.timeStamp} >= next timestamp:#{nextBlk.timeStamp}"
-		return false
+		if seconds > next_blk_seconds
+      puts "Current timestamp:#{blk.timeStamp} >= next timestamp:#{nextBlk.timeStamp}"
+      return false
+    # Seconds same test nano seconds
+    elsif seconds == next_blk_seconds
+      # Longer length means longer time
+      if nanoseconds.length > next_blk_ns.length
+        puts "Current timestamp:#{blk.timeStamp} >= next timestamp:#{nextBlk.timeStamp}"
+        return false
+      # If same length, compare values
+      elsif nanoseconds.length == next_blk_ns.length
+        if nanoseconds > next_blk_ns
+          puts "Current timestamp:#{blk.timeStamp} >= next timestamp:#{nextBlk.timeStamp}"
+          return false
+        end
+      end
+    end
 	  }
+    return true
+  end
+
+  def verify_hash_value blockArray
+    blockArray.each_with_index { |blk, idx| break if idx == blockArray.length
+      block_number = blk.blockNumber
+      previous_hash = blk.previousHash
+      transactions = blk.transactions
+      timestamp = blk.timeStamp
+
+      #construct string for hashing
+      total_string = block_number + "|" + previous_hash + "|" + transactions + "|" + timestamp
+      total_string_pack = total_string.unpack('U*')
+
+      value = 0
+
+      total_string_pack.each_with_index { |x, idy| break if idy == total_string_pack.length
+        value += (x ** 2000) * ((x + 2) ** 21) - ((x + 5) ** 3)
+        value = value % 65536
+      }
+
+      value = value % 65536
+      hash_value = value.to_s(16)
+      if(blk.endHash.chomp != hash_value)
+        puts "The hash value for line #{idx} is #{blk.endHash} but should be #{hash_value}"
+        return false
+      end
+    }
+    return true
   end
 
   def create_block someBlock
