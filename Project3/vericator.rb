@@ -1,4 +1,5 @@
 require_relative "Block"
+require 'openssl'
 
 
 class Vericator
@@ -151,23 +152,32 @@ class Vericator
 
   def verify_hash_value blockArray
     blockArray.each { |blk|
-      
+
 	  #construct string for hashing
 	  hashableStringPacked = blk.hashableString.unpack('U*')
 
-      value = 0
+    value = 0
 
-      hashableStringPacked.each { |x| 
-        value += (x ** 2000) * ((x + 2) ** 21) - ((x + 5) ** 3)
-        value = value % 65536
-      }
+    hashableStringPacked.each { |x|
+      a = x + 2
+      b = x + 5
+      m = 65536
+      v1 = x.to_bn.mod_exp(2000, m)
+      v2 = a.to_bn.mod_exp(21, m)
+      v3 = b.to_bn.mod_exp(3, m)
+
+      #value += (x ** 2000) * ((x + 2) ** 21) - ((x + 5) ** 3)
+      value += (v1) * (v2) - (v3)
 
       value = value % 65536
-      hashValue = value.to_s(16)
-      if(blk.endHash.chomp != hashValue)
-        puts "The hash value for line #{idx} is #{blk.endHash} but should be #{hashValue}"
-        return false
-      end
+    }
+
+    value = value % 65536
+    hashValue = value.to_s(16)
+    if(blk.endHash.chomp != hashValue)
+      puts "The hash value for line #{idx} is #{blk.endHash} but should be #{hashValue}"
+      return false
+    end
     }
     return true
   end
