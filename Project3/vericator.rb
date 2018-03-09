@@ -128,7 +128,7 @@ class Vericator
 		next_blk_ns = nextBlk.timeStamp.slice(/\..*$/)
 		next_blk_ns.delete! "." # Get rid of "."
 		# Test seconds
-		if seconds > next_blk_seconds
+	if seconds > next_blk_seconds
       puts "Current timestamp:#{blk.timeStamp} >= next timestamp:#{nextBlk.timeStamp}"
       return false
     # Seconds same test nano seconds
@@ -144,33 +144,28 @@ class Vericator
           return false
         end
       end
-    end
+	end
 	  }
     return true
   end
 
   def verify_hash_value blockArray
-    blockArray.each_with_index { |blk, idx| break if idx == blockArray.length
-      block_number = blk.blockNumber
-      previous_hash = blk.previousHash
-      transactions = blk.transactions
-      timestamp = blk.timeStamp
-
-      #construct string for hashing
-      total_string = block_number + "|" + previous_hash + "|" + transactions + "|" + timestamp
-      total_string_pack = total_string.unpack('U*')
+    blockArray.each { |blk|
+      
+	  #construct string for hashing
+	  hashableStringPacked = blk.hashableString.unpack('U*')
 
       value = 0
 
-      total_string_pack.each_with_index { |x, idy| break if idy == total_string_pack.length
+      hashableStringPacked.each { |x| 
         value += (x ** 2000) * ((x + 2) ** 21) - ((x + 5) ** 3)
         value = value % 65536
       }
 
       value = value % 65536
-      hash_value = value.to_s(16)
-      if(blk.endHash.chomp != hash_value)
-        puts "The hash value for line #{idx} is #{blk.endHash} but should be #{hash_value}"
+      hashValue = value.to_s(16)
+      if(blk.endHash.chomp != hashValue)
+        puts "The hash value for line #{idx} is #{blk.endHash} but should be #{hashValue}"
         return false
       end
     }

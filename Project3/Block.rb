@@ -16,8 +16,10 @@ class Block
     @transactions = transactions
     @timeStamp = timeStamp
     @endHash = endHash
+	@hashableString = blockNumber + "|" + previousHash + "|" + transactions + "|" + timeStamp
   end
 
+  attr_reader :hashableString
   attr_reader :blockNumber
   attr_reader :previousHash
   attr_reader :transactions
