@@ -46,7 +46,7 @@ class Vericator
     end
   end
 
-  def verify_hashes blockArray
+  def verify_matching_hashes blockArray
 	  # idx + 1 so we don't overrun array
 	  blockArray.each_with_index { |blk, idx| break if idx + 1 == blockArray.length
 		  # Check if our endHash == next block's previousHash
@@ -128,24 +128,24 @@ class Vericator
 		nanoseconds.delete! "." # Get rid of "."
 		next_blk_ns = nextBlk.timeStamp.slice(/\..*$/)
 		next_blk_ns.delete! "." # Get rid of "."
-		# Test seconds
-	if seconds > next_blk_seconds
-      puts "Current timestamp:#{blk.timeStamp} >= next timestamp:#{nextBlk.timeStamp}"
-      return false
-    # Seconds same test nano seconds
-    elsif seconds == next_blk_seconds
-      # Longer length means longer time
-      if nanoseconds.length > next_blk_ns.length
-        puts "Current timestamp:#{blk.timeStamp} >= next timestamp:#{nextBlk.timeStamp}"
-        return false
-      # If same length, compare values
-      elsif nanoseconds.length == next_blk_ns.length
-        if nanoseconds > next_blk_ns
-          puts "Current timestamp:#{blk.timeStamp} >= next timestamp:#{nextBlk.timeStamp}"
-          return false
+	    # Test seconds
+        if seconds.to_i > next_blk_seconds.to_i
+		  puts "Current timestamp:#{blk.timeStamp} >= next timestamp:#{nextBlk.timeStamp}"
+	      return false
+	    # Seconds same test nano seconds
+		elsif seconds.to_i == next_blk_seconds.to_i
+          # Longer length means longer time
+		  if nanoseconds.length > next_blk_ns.length
+            puts "Current timestamp:#{blk.timeStamp} >= next timestamp:#{nextBlk.timeStamp}"
+            return false
+		  end
+        # If same length, compare values
+        elsif nanoseconds.length == next_blk_ns.length
+          if nanoseconds.to_i > next_blk_ns.to_i
+            puts "Current timestamp:#{blk.timeStamp} >= next timestamp:#{nextBlk.timeStamp}"
+            return false
+          end
         end
-      end
-	end
 	  }
     return true
   end
@@ -175,7 +175,7 @@ class Vericator
     value = value % 65536
     hashValue = value.to_s(16)
     if(blk.endHash.chomp != hashValue)
-      puts "The hash value for line #{idx} is #{blk.endHash} but should be #{hashValue}"
+		puts "The hash value for line #{blk.blockNumber} is #{blk.endHash} but should be #{hashValue}"
       return false
     end
     }

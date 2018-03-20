@@ -43,7 +43,7 @@ end
 abort "BLOCKCHAIN INVALID" unless veri.verify_order blockArray
 
 # Make sure previous hashes match end hashes
-abort "BLOCKCHAIN INVALID" unless veri.verify_hashes blockArray
+abort "BLOCKCHAIN INVALID" unless veri.verify_matching_hashes blockArray
 
 # Check that timestamps are valid
 abort "BLOCKCHAIN INVALID" unless veri.verify_time blockArray
