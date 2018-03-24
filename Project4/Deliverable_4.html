@@ -37,24 +37,160 @@
 <tr><td rowspan="1" colspan="3">factorial_link</td></tr>
 </thead>
 <tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/<datalist><option>https://cs1632ex.herokuapp.com/</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>link=Factorial<datalist><option>link=Factorial</option><option>//a[contains(text(),'Factorial')]</option><option>//a[contains(@href, '/fact')]</option><option>//li[2]/a</option></datalist></td><td></td>
+</tr>
+<tr><td>assertText</td><td>//h2<datalist><option>//h2</option><option>css=h2</option></datalist></td><td>*Enter number to calculate factorial of:*</td>
+</tr>
 </tbody></table>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
 <tr><td rowspan="1" colspan="3">fibonacci_link</td></tr>
 </thead>
 <tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/<datalist><option>https://cs1632ex.herokuapp.com/</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>link=Fibonacci<datalist><option>link=Fibonacci</option><option>//a[contains(text(),'Fibonacci')]</option><option>//a[contains(@href, '/fib')]</option><option>//li[4]/a</option></datalist></td><td></td>
+</tr>
+<tr><td>assertText</td><td>//h2<datalist><option>//h2</option><option>css=h2</option></datalist></td><td>*Enter number to calculate Fibonacci of:*</td>
+</tr>
 </tbody></table>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
 <tr><td rowspan="1" colspan="3">hello_link</td></tr>
 </thead>
 <tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/<datalist><option>https://cs1632ex.herokuapp.com/</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>link=Hello<datalist><option>link=Hello</option><option>//a[contains(text(),'Hello')]</option><option>//a[contains(@href, '/hello')]</option><option>//li[6]/a</option></datalist></td><td></td>
+</tr>
+<tr><td>assertText</td><td>//h2<datalist><option>//h2</option><option>css=h2</option></datalist></td><td>*Hello CS1632, from Prof. Laboon!*</td>
+</tr>
 </tbody></table>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">cathedral_link</td></tr>
+<tr><td rowspan="1" colspan="3">cathy_link</td></tr>
 </thead>
 <tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/<datalist><option>https://cs1632ex.herokuapp.com/</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>link=Cathedral Pics<datalist><option>link=Cathedral Pics</option><option>//a[contains(text(),'Cathedral Pics')]</option><option>//a[contains(@href, '/cathy')]</option><option>//li[8]/a</option></datalist></td><td></td>
+</tr>
+<tr><td>assertText</td><td>//h2<datalist><option>//h2</option><option>css=h2</option></datalist></td><td>*Cathedral Pictures*</td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">factorial_func</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/<datalist><option>https://cs1632ex.herokuapp.com/</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>link=Factorial<datalist><option>link=Factorial</option><option>//a[contains(text(),'Factorial')]</option><option>//a[contains(@href, '/fact')]</option><option>//li[2]/a</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>name=value<datalist><option>name=value</option><option>//input[@name='value']</option><option>//input</option><option>css=input[name="value"]</option></datalist></td><td></td>
+</tr>
+<tr><td>type</td><td>name=value<datalist><option>name=value</option><option>//input[@name='value']</option><option>//input</option><option>css=input[name="value"]</option></datalist></td><td>5</td>
+</tr>
+<tr><td>click</td><td>//input[@value='Submit']<datalist><option>//input[@value='Submit']</option><option>//input[2]</option><option>css=input[type="submit"]</option></datalist></td><td></td>
+</tr>
+<tr><td>assertText</td><td>//h2<datalist><option>//h2</option><option>css=h2</option></datalist></td><td>*Factorial of 5 is 120!*</td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">fibonacci_func</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/<datalist><option>https://cs1632ex.herokuapp.com/</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>link=Fibonacci<datalist><option>link=Fibonacci</option><option>//a[contains(text(),'Fibonacci')]</option><option>//a[contains(@href, '/fib')]</option><option>//li[4]/a</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>id=tb1<datalist><option>id=tb1</option><option>name=value</option><option>//input[@id='tb1']</option><option>//input</option><option>css=#tb1</option></datalist></td><td></td>
+</tr>
+<tr><td>type</td><td>id=tb1<datalist><option>id=tb1</option><option>name=value</option><option>//input[@id='tb1']</option><option>//input</option><option>css=#tb1</option></datalist></td><td>5</td>
+</tr>
+<tr><td>click</td><td>id=sub<datalist><option>id=sub</option><option>//input[@id='sub']</option><option>//input[2]</option><option>css=#sub</option></datalist></td><td></td>
+</tr>
+<tr><td>assertText</td><td>//h2<datalist><option>//h2</option><option>css=h2</option></datalist></td><td>*Fibonacci of 5 is 8!*</td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">factorial_invalid</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/<datalist><option>https://cs1632ex.herokuapp.com/</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>link=Factorial<datalist><option>link=Factorial</option><option>//a[contains(text(),'Factorial')]</option><option>//a[contains(@href, '/fact')]</option><option>//li[2]/a</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>name=value<datalist><option>name=value</option><option>//input[@name='value']</option><option>//input</option><option>css=input[name="value"]</option></datalist></td><td></td>
+</tr>
+<tr><td>type</td><td>name=value<datalist><option>name=value</option><option>//input[@name='value']</option><option>//input</option><option>css=input[name="value"]</option></datalist></td><td>-100</td>
+</tr>
+<tr><td>sendKeys</td><td>name=value<datalist><option>name=value</option><option>//input[@name='value']</option><option>//input</option><option>css=input[name="value"]</option></datalist></td><td>${KEY_ENTER}</td>
+</tr>
+<tr><td>click</td><td>//input[@value='Submit']<datalist><option>//input[@value='Submit']</option><option>//input[2]</option><option>css=input[type="submit"]</option></datalist></td><td></td>
+</tr>
+<tr><td>assertText</td><td>//h2<datalist><option>//h2</option><option>css=h2</option></datalist></td><td>*Factorial of -100 is 1!*</td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">fibonacci_invalid</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/<datalist><option>https://cs1632ex.herokuapp.com/</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>link=Fibonacci<datalist><option>link=Fibonacci</option><option>//a[contains(text(),'Fibonacci')]</option><option>//a[contains(@href, '/fib')]</option><option>//li[4]/a</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>id=tb1<datalist><option>id=tb1</option><option>name=value</option><option>//input[@id='tb1']</option><option>//input</option><option>css=#tb1</option></datalist></td><td></td>
+</tr>
+<tr><td>type</td><td>id=tb1<datalist><option>id=tb1</option><option>name=value</option><option>//input[@id='tb1']</option><option>//input</option><option>css=#tb1</option></datalist></td><td>-100</td>
+</tr>
+<tr><td>sendKeys</td><td>id=tb1<datalist><option>id=tb1</option><option>name=value</option><option>//input[@id='tb1']</option><option>//input</option><option>css=#tb1</option></datalist></td><td>${KEY_ENTER}</td>
+</tr>
+<tr><td>click</td><td>id=sub<datalist><option>id=sub</option><option>//input[@id='sub']</option><option>//input[2]</option><option>css=#sub</option></datalist></td><td></td>
+</tr>
+<tr><td>assertText</td><td>//h2<datalist><option>//h2</option><option>css=h2</option></datalist></td><td>*Fibonacci of -100 is 1!*</td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">hello_no_trailing</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/hello<datalist><option>https://cs1632ex.herokuapp.com/</option><option>https://cs1632ex.herokuapp.com/hello</option></datalist></td><td></td>
+</tr>
+<tr><td>assertText</td><td>//h2<datalist><option>//h2</option><option>css=h2</option></datalist></td><td>*Hello CS1632, from Prof. Laboon!*</td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">hello_trailing</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/hello/Jazzy<datalist><option>https://cs1632ex.herokuapp.com/</option><option>https://cs1632ex.herokuapp.com/hello/Jazzy</option></datalist></td><td></td>
+</tr>
+<tr><td>assertText</td><td>//h2<datalist><option>//h2</option><option>css=h2</option></datalist></td><td>*Hello CS1632, from Jazzy!*</td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">cathy_pictures</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/cathy<datalist><option>https://cs1632ex.herokuapp.com/</option><option>https://cs1632ex.herokuapp.com/cathy</option></datalist></td><td></td>
+</tr>
+<tr><td>assertElementPresent</td><td>//ol<datalist><option>//ol</option><option>css=ol</option></datalist></td><td></td>
+</tr>
+<tr><td>assertElementPresent</td><td>//img[@alt='Sunny Cathedral']<datalist><option>//img[@alt='Sunny Cathedral']</option><option>//img</option><option>css=img[alt="Sunny Cathedral"]</option></datalist></td><td></td>
+</tr>
+<tr><td>assertElementPresent</td><td>//img[@alt='Alpenglow Cathedral']<datalist><option>//img[@alt='Alpenglow Cathedral']</option><option>//li[2]/img</option><option>css=img[alt="Alpenglow Cathedral"]</option></datalist></td><td></td>
+</tr>
+<tr><td>assertElementPresent</td><td>//img[@alt='Old Cathedral']<datalist><option>//img[@alt='Old Cathedral']</option><option>//li[3]/img</option><option>css=img[alt="Old Cathedral"]</option></datalist></td><td></td>
+</tr>
 </tbody></table>
 </body>
 </html>
