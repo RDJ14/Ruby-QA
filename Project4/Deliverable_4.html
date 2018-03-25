@@ -217,11 +217,11 @@
 </tr>
 <tr><td>click</td><td>name=value<datalist><option>name=value</option><option>//input[@name='value']</option><option>//input</option><option>css=input[name="value"]</option></datalist></td><td></td>
 </tr>
-<tr><td>type</td><td>name=value<datalist><option>name=value</option><option>//input[@name='value']</option><option>//input</option><option>css=input[name="value"]</option></datalist></td><td>123</td>
+<tr><td>type</td><td>name=value<datalist><option>name=value</option><option>//input[@name='value']</option><option>//input</option><option>css=input[name="value"]</option></datalist></td><td>99</td>
 </tr>
 <tr><td>click</td><td>//input[@value='Submit']<datalist><option>//input[@value='Submit']</option><option>//input[2]</option><option>css=input[type="submit"]</option></datalist></td><td></td>
 </tr>
-<tr><td>assertNotText</td><td>//h2<datalist><option>//h2</option><option>css=h2</option></datalist></td><td>*Factorial of 123 is 1!*</td>
+<tr><td>assertNotText</td><td>//h2<datalist><option>//h2</option><option>css=h2</option></datalist></td><td>*Factorial of 99 is 1!*</td>
 </tr>
 </tbody></table>
 <table cellpadding="1" cellspacing="1" border="1">
@@ -240,6 +240,78 @@
 <tr><td>click</td><td>id=sub<datalist><option>id=sub</option><option>//input[@id='sub']</option><option>//input[2]</option><option>css=#sub</option></datalist></td><td></td>
 </tr>
 <tr><td>assertText</td><td>//h2<datalist><option>//h2</option><option>css=h2</option></datalist></td><td>*Fibonacci of 10 is 55!*</td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">fibonacci_boundary</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/<datalist><option>https://cs1632ex.herokuapp.com/</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>link=Fibonacci<datalist><option>link=Fibonacci</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>id=tb1<datalist><option>link=value</option><option>id=tb1</option></datalist></td><td></td>
+</tr>
+<tr><td>type</td><td>id=tb1<datalist><option>name=value</option><option>id=tb1</option></datalist></td><td>99</td>
+</tr>
+<tr><td>click</td><td>//input[@value='Submit']<datalist><option>//input[@value='Submit']</option></datalist></td><td></td>
+</tr>
+<tr><td>assertText</td><td>//h2<datalist><option>//h2</option></datalist></td><td>*Fibonacci of 99 is 218922995834555169026!*</td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">factorial_empty</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/<datalist><option>https://cs1632ex.herokuapp.com/</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>link=Factorial<datalist><option>link=Factorial</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>name=value<datalist><option>name=value</option></datalist></td><td></td>
+</tr>
+<tr><td>type</td><td>name=value<datalist><option>name=value</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>//input[@value='Submit']<datalist><option>//input[@value='Submit']</option></datalist></td><td></td>
+</tr>
+<tr><td>assertNotText</td><td>//Body<datalist><option>//Body</option></datalist></td><td>*Internal server error*</td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">fibonacci_invalid_characters</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/<datalist><option>https://cs1632ex.herokuapp.com/</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>link=Fibonacci<datalist><option>link=Fibonacci</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>id=tb1<datalist><option>id=tb1</option><option>link=value</option></datalist></td><td></td>
+</tr>
+<tr><td>type</td><td>id=tb1<datalist><option>id=tb1</option><option>name=value</option></datalist></td><td>Invalid String </td>
+</tr>
+<tr><td>click</td><td>//input[@value='Submit']<datalist><option>//input[@value='Submit']</option></datalist></td><td></td>
+</tr>
+<tr><td>assertNotText</td><td>//body<datalist><option>//h2</option><option>//body</option></datalist></td><td>*Internal server error*</td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">factorial_invalid_characters</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>https://cs1632ex.herokuapp.com/<datalist><option>https://cs1632ex.herokuapp.com/</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>link=Factorial<datalist><option>link=Fibonacci</option><option>link=Factorial</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>name=value<datalist><option>name=value</option></datalist></td><td></td>
+</tr>
+<tr><td>type</td><td>name=value<datalist><option>name=value</option></datalist></td><td>*Internal server error*</td>
+</tr>
+<tr><td>click</td><td>//input[@value='Submit']<datalist><option>//input[@value='Submit']</option></datalist></td><td></td>
+</tr>
+<tr><td>assertNotText</td><td>//Body<datalist><option>//Body</option></datalist></td><td>*Internal server error*</td>
 </tr>
 </tbody></table>
 </body>
