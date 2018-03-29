@@ -1,67 +1,94 @@
 class Interpreter
 
-  # HashMap for storing variables, can check if they've been declared
-  @repl_mode = false
-  @variables = Hash.new
-  @tokenStack = Array.new
-  @operators = ['+', '-', '/', '*']
-  @lineNumber = 0
-
   def initialize repl, args # For using RPN++ in repl mode
+    @debug = true
+    @repl_mode = false
+    @variables = Hash.new
+    @tokenStack = Array.new
+    @operators = ['+', '-', '/', '*']
+    @lineNumber = 0
+	puts "init" if @debug
     @repl_mode = repl
-	if repl
-	self.read_all_files(args) # Read file array if we're REPLinga
+	if not repl
+	  puts "init, not repl" if @debug
+      # Read file array if we're REPLing
+	  error(0, "Invalid arguments") if (self.read_all_files(args)).nil?
 	else
+	  puts "init repl" if @debug
 	  input = gets.chomp
       while not input.downcase.eql? "quit"
-        add_to_stack(0, tokenStack)
+	    add_to_stack(0, input, @tokenStack)
       end
 	end
   end
 
   def read_all_files filename_array
-    unless filename_array.each {|f| f.is_a? String}
-      error(lineNumber, "Arguments are not valid filenames")
-    end
+	return nil unless filename_array is_a? Array
+	puts "read_all_files" if @debug
     filename_array.each {|f| read_file(f)}
   end
 
   def read_file filename
-   	error(lineNumber, "#{filename} not found") unless File.exist?(filename)
+    error(lineNumber, "Arguments are not valid filenames") unless filename is_a? String
+	puts "read_file" if @debug
+    unless filename_array.each {|f| f.is_a? String}
+   	  error(lineNumber, "#{filename} not found") unless File.exist?(filename)
+    end
     file = File.open(filename,"r")
 	file.each_line {|i| @lineNumber = @lineNumber + 1
-				 i.add_to_stack(@lineNumber, @tokenStack)} # Calls function per line
+				 add_to_stack(i, @lineNumber, @tokenStack)} # Calls function per line
   end
 
-  def add_to_stack lineNumber, tokenStack
+  def add_to_stack lineNumber, line, tokenStack
+	if @debug
+      error(lineNumber, "tokenStack is not array") unless tokenStack.is_a? Array
+      error(lineNumber, "line is not string") unless line.is_a? String
+      error(lineNumber, "tokenStack is not integer") unless lineNumber.is_a? Integer
+	end
+	puts "add_to_stack" if @debug
 	# Pushes tokens from line onto stack
     lineNumber = lineNumber + 1
 	line.downcase! # Make line case insensitive
-    while not line.isEmpty?
-	  nextToken = line.chomp!(' ')
-	  tokenStack.push(nextToken) # Push space-delimited tokens
-	  if operators.include? tokenStack[-1]
+	tokenArray = line.split # Split into array
+	tokenArray.each { |token|
+	  puts "add_to_stack token:#{token}" if @debug
+	  tokenStack.push(token) # Push space-delimited tokens
+	  if @operators.include? tokenStack[-1]
         # Do binary op if we reached an operator
 	    # Push result onto top of stack
-	    tokenStack.push(binary_operation(lineNumber, tokenStack))  
+		result = binary_operation(lineNumber, tokenStack)
+	    tokenStack.push(result)
 	  end
-    end
-    evalute(tokenStack)
+	}
+    evaluate(tokenStack)
   end
 
   def binary_operation lineNumber, tokenStack
+	puts "binary_operation" if @debug
     # Top of stack is an operator
 	# Second from top is RHS, third is LHS
 	op = tokenStack.pop
-	rhs = tokenStack.pop
-	lhs = tokenStack.pop
-	error(lineNumber "Operator #{op} applied to empty stack") if lhs.nil? OR rhs.nil? 
-    error(lineNumber "Invalid operand #{rhs}") unless rhs.is_a? Numeric OR rhs.match(/[a-z]/)
-    error(lineNumber "Invalid operand #{lhs}") unless lhs.is_a? Numeric OR lhs.match(/[a-z]/)
-	error(lineNumber "Variable #{rhs} is not initialized") unless variables.has_key? rhs
-	error(lineNumber "Variable #{lhs} is not initialized") unless variables.has_key? lhs
-    rhs = variables[rhs] if rhs.match(/[a-z]/) # Dereference variable
-    lhs = variables[lhs] if lhs.match(/[a-z]/) # Dereference variable
+	rhs = tokenStack.pop.to_i
+	lhs = tokenStack.pop.to_i
+	error(lineNumber, "Operator #{op} applied to empty stack") if lhs.nil? or rhs.nil?
+    unless lhs.class < Numeric or lhs.match(/[a-z]/)
+      puts "lhs class: #{lhs.class}" if @debug
+    end
+    unless rhs.class < Numeric or rhs.match(/[a-z]/)
+      puts "rhs class: #{rhs.class}" if @debug
+    end
+    if rhs.is_a? String
+      unless @variables.has_key? rhs
+	  error(lineNumber, "Variable #{rhs} is not initialized")
+      end
+	  rhs = @variables[rhs] if rhs.match(/[a-z]/) # Dereference variable
+    end
+    if lhs.is_a? String
+      unless @variables.has_key? lhs
+	  error(lineNumber, "Variable #{lhs} is not initialized")
+      end
+      lhs = @variables[lhs] if lhs.match(/[a-z]/) # Dereference variable
+    end
 	case op
 	  when '+'
 		  result = lhs + rhs
@@ -76,14 +103,15 @@ class Interpreter
   end
   
   def evaluate tokenStack
+	puts "evaluate" if @debug
 	# Check for keywords here since binary operations 
     # should have been simplified by now
-	error(lineNumber "Could not evaluate expression") if tokenStack.isEmpty?
-	if tokenStack[0].match(/print/)
+	error(lineNumber "Could not evaluate expression") if tokenStack.empty?
+	if tokenStack[0].is_a String and tokenStack[0].match(/print/)
 	  # Print instruction
       result = tokenStack[1]
-      unless result.is_a? Numeric OR result.match(/[a-z]/)
-        error(lineNumber "Invalid operand #{result}")
+      unless result.class < Numeric or result.match(/[a-z]/)
+        error(lineNumber "Invalid operand \"#{result}\"")
       end
       result = variables[result] if result.match(/[a-z]/) # Dereference variable
       if tokenStack.size > 2
@@ -91,7 +119,7 @@ class Interpreter
       end
 	  error(lineNumber "Operator PRINT applied to empty stack") if tokenStack.size == 1
       puts result
-	elsif tokenStack[0].match(/let/)
+	elsif tokenStack[0].is_a String and  tokenStack[0].match(/let/)
 	  # Variable assignment
       result = tokenStack[2]
 	  newVar = tokenStack[1]
@@ -101,9 +129,10 @@ class Interpreter
 	  end 
 	  error(lineNumber "Operator LET applied to empty stack") if tokenStack.size <= 2
 	  @variables[newVar] = result # Put new variable itno hash table
-	elsif tokenStack[0].match(/quit/)
+	elsif tokenStack[0].is_a String and  tokenStack[0].match(/quit/)
       exit
-	elsif tokenStack[0].match(/[^0-9a-z]/) # Anything that isnt a number or letter
+	elsif tokenStack[0].is_a String and  tokenStack[0].match(/[^0-9a-z]/)
+      # Anything that isnt a number or letter
 	  error(lineNumber "Invalid keyword #{tokenStack[0]}")
 	else
       # If there isn't a keyword, then the bottom of the stack should
@@ -117,7 +146,7 @@ class Interpreter
   end
 
   def error lineNumber, message
-    if @repl_mode
+    if not @repl_mode
       puts "Line #{lineNumber}: " + message
 	else 
       puts message
