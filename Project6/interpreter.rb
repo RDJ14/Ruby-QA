@@ -18,6 +18,8 @@ class Interpreter
 	  input = gets.chomp
       while not input.downcase.eql? "quit"
 	    add_to_stack(0, input, @tokenStack)
+		input = gets.chomp
+		@tokenStack = Array.new
       end
 	end
   end
@@ -60,7 +62,7 @@ class Interpreter
 	    tokenStack.push(result)
 	  end
 	}
-    evaluate(tokenStack)
+    evaluate(lineNumber, tokenStack)
   end
 
   def binary_operation lineNumber, tokenStack
@@ -102,12 +104,12 @@ class Interpreter
 	return result
   end
   
-  def evaluate tokenStack
+  def evaluate lineNumber, tokenStack
 	puts "evaluate" if @debug
 	# Check for keywords here since binary operations 
     # should have been simplified by now
 	error(lineNumber "Could not evaluate expression") if tokenStack.empty?
-	if tokenStack[0].is_a String and tokenStack[0].match(/print/)
+	if tokenStack[0].is_a? String and tokenStack[0].match(/print/)
 	  # Print instruction
       result = tokenStack[1]
       unless result.class < Numeric or result.match(/[a-z]/)
@@ -119,7 +121,7 @@ class Interpreter
       end
 	  error(lineNumber "Operator PRINT applied to empty stack") if tokenStack.size == 1
       puts result
-	elsif tokenStack[0].is_a String and  tokenStack[0].match(/let/)
+	elsif tokenStack[0].is_a? String and  tokenStack[0].match(/let/)
 	  # Variable assignment
       result = tokenStack[2]
 	  newVar = tokenStack[1]
@@ -129,19 +131,19 @@ class Interpreter
 	  end 
 	  error(lineNumber "Operator LET applied to empty stack") if tokenStack.size <= 2
 	  @variables[newVar] = result # Put new variable itno hash table
-	elsif tokenStack[0].is_a String and  tokenStack[0].match(/quit/)
+	elsif tokenStack[0].is_a? String and  tokenStack[0].match(/quit/)
       exit
-	elsif tokenStack[0].is_a String and  tokenStack[0].match(/[^0-9a-z]/)
+	elsif tokenStack[0].is_a? String and  tokenStack[0].match(/[^0-9a-z]/)
       # Anything that isnt a number or letter
 	  error(lineNumber "Invalid keyword #{tokenStack[0]}")
 	else
       # If there isn't a keyword, then the bottom of the stack should
 	  # be a number 
-	  error(lineNumber "#{tokenStack.size} elements left on stack") unless tokenStack.size == 1
+	  error(lineNumber, "#{tokenStack.size} elements left on stack") unless tokenStack.size == 1
       result = tokenStack[0] 
 	end
 	if @repl_mode == true
-	  puts "> " + result # REPL output
+	  puts "> #{result}" # REPL output
 	end
   end
 
