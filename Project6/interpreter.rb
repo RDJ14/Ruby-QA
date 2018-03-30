@@ -112,16 +112,16 @@ class Interpreter
 	error(lineNumber, "Could not evaluate expression") if tokenStack.empty?
 	if tokenStack[0].is_a? String and tokenStack[0].match(/print/)
 	  # Print instruction
+	  error(lineNumber, "Operator PRINT applied to empty stack") if tokenStack.size < 2
       result = tokenStack.pop # should be tokenStack[1]
       unless result.class < Numeric or result.match(/[a-z]/) # if result is some type of number
         error(lineNumber, "Invalid operand \"#{result}\"")
       end
-      result = variables[result] if result.match(/[a-z]/) # Dereference variable
+      result = @variables[result] if result.match(/[a-z]/) # Dereference variable
       if tokenStack.size > 2
 		puts "evaluate, tokenStack size:#{tokenStack.size}" if @debug
 	    error(lineNumber, "#{tokenStack.size - 1} elements left on stack" )
       end
-	  error(lineNumber, "Operator PRINT applied to empty stack") if tokenStack.size == 1
       puts result
 	elsif tokenStack[0].is_a? String and tokenStack[0].match(/let/)
 	  # Variable assignment
