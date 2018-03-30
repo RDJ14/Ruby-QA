@@ -1,4 +1,4 @@
-require_relative "interpreter"
+require_relative "Interpreter"
 
 # Main 
 repl_mode = false 
