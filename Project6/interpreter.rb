@@ -11,6 +11,9 @@ class TokenStack
   def reset
     @tokenStack = Array.new
   end
+  def bottom
+    return @tokenStack[0]
+  end
 end
 
 
@@ -23,15 +26,16 @@ class Interpreter
     @operators = ['+', '-', '/', '*']
     @lineNumber = 0
     @repl_mode = repl
-	if not repl
+	if repl
+      loop do
+        print "> " # Print avoids the newline
+	    input = gets.chomp
+        break if input.downcase.eql? "quit"
+        add_to_stack(0, input, Array.new)
+      end
+	else
       # Read file array if we're REPLing
 	  error(0, "Invalid arguments") if (self.read_all_files(args)).nil?
-	else
-	  input = gets.chomp
-      while not input.downcase.eql? "quit"
-        add_to_stack(0, input, Array.new)
-		input = gets.chomp
-      end
 	end
   end
 
@@ -139,7 +143,7 @@ class Interpreter
       result = tokenStack[0] 
 	end
 	if @repl_mode == true
-	  puts "> #{result}" # REPL output
+	  puts result # REPL output
 	end
   end
 
