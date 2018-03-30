@@ -1,20 +1,32 @@
+class TokenStack
+  def initialize
+    @tokenStack = Array.new
+  end
+  def push token
+    @tokenStack.push(token)
+  end
+  def pop 
+    return @tokenStack.pop
+  end
+  def reset
+    @tokenStack = Array.new
+  end
+end
+
+
 class Interpreter
 
   def initialize repl, args # For using RPN++ in repl mode
-    @debug = true
     @repl_mode = false
     @variables = Hash.new
     @tokenStack = Array.new
     @operators = ['+', '-', '/', '*']
     @lineNumber = 0
-	puts "init" if @debug
     @repl_mode = repl
 	if not repl
-	  puts "init, not repl" if @debug
       # Read file array if we're REPLing
 	  error(0, "Invalid arguments") if (self.read_all_files(args)).nil?
 	else
-	  puts "init repl" if @debug
 	  input = gets.chomp
       while not input.downcase.eql? "quit"
         add_to_stack(0, input, Array.new)
@@ -25,36 +37,25 @@ class Interpreter
 
   def read_all_files filename_array
     return nil unless filename_array.is_a? Array
-	puts "read_all_files" if @debug
-    filename_array.each { |f| puts "read_all_files, f:#{f}" if @debug
+    filename_array.each { |f|
 		error(lineNumber, "#{f} not found") unless File.exist?(f)
 		read_file(f) }
   end
 
   def read_file filename
     error(lineNumber, "Arguments are not valid filenames") unless filename.is_a? String
-	puts "read_file" if @debug
     file = File.open(filename,"r")
-	puts "read_file, opened #{filename}" if @debug
-	file.each_line {|line| puts "read_file, line:#{line}" if @debug
-	             break if line.empty?
+	file.each_line {|line| break if line.empty?
                  @lineNumber = @lineNumber + 1
 				 add_to_stack(@lineNumber, line, Array.new)} # Calls function per line
   end
 
   def add_to_stack lineNumber, line, tokenStack
-	if @debug
-      error(lineNumber, "tokenStack is not array") unless tokenStack.is_a? Array
-      #error(lineNumber, "line is not string") unless line.is_a? String
-      error(lineNumber, "tokenStack is not integer") unless lineNumber.is_a? Integer
-	end
-	puts "add_to_stack" if @debug
 	# Pushes tokens from line onto stack
     lineNumber = lineNumber + 1
 	line.downcase! # Make line case insensitive
 	tokenArray = line.split # Split into array
 	tokenArray.each { |token|
-	  puts "add_to_stack token:#{token}" if @debug
 	  tokenStack.push(token) # Push space-delimited tokens
 	  if @operators.include? tokenStack[-1]
         # Do binary op if we reached an operator
@@ -67,19 +68,12 @@ class Interpreter
   end
 
   def binary_operation lineNumber, tokenStack
-	puts "binary_operation" if @debug
     # Top of stack is an operator
 	# Second from top is RHS, third is LHS
 	op = tokenStack.pop
 	rhs = tokenStack.pop.to_i
 	lhs = tokenStack.pop.to_i
 	error(lineNumber, "Operator #{op} applied to empty stack") if lhs.nil? or rhs.nil?
-    unless lhs.class < Numeric or lhs.match(/[a-z]/)
-      puts "lhs class: #{lhs.class}" if @debug
-    end
-    unless rhs.class < Numeric or rhs.match(/[a-z]/)
-      puts "rhs class: #{rhs.class}" if @debug
-    end
     if rhs.is_a? String
       unless @variables.has_key? rhs
 	  error(lineNumber, "Variable #{rhs} is not initialized")
@@ -106,12 +100,11 @@ class Interpreter
   end
   
   def evaluate lineNumber, tokenStack
-	puts "evaluate" if @debug
 	# Check for keywords here since binary operations 
     # should have been simplified by now
 	error(lineNumber, "Could not evaluate expression") if tokenStack.empty?
 	if tokenStack[0].is_a? String and tokenStack[0].match(/print/)
-	  # Print instruction
+	  # PRINT instruction
 	  error(lineNumber, "Operator PRINT applied to empty stack") if tokenStack.size < 2
       result = tokenStack.pop # should be tokenStack[1]
       unless result.class < Numeric or result.match(/[a-z]/) # if result is some type of number
@@ -119,24 +112,24 @@ class Interpreter
       end
 	  result = @variables[result] if result.is_a? String and result.match(/[a-z]/) # Dereference variable
       if tokenStack.size > 2
-		puts "evaluate, tokenStack size:#{tokenStack.size}" if @debug
 	    error(lineNumber, "#{tokenStack.size - 1} elements left on stack" )
       end
       puts result
 	elsif tokenStack[0].is_a? String and tokenStack[0].match(/let/)
-	  # Variable assignment
+	  # LET instruction
       result = tokenStack.pop # tokenStack[2]
 	  error(lineNumber, "Operator LET applied to empty stack") if tokenStack.size < 2
 	  newVar = tokenStack.pop # tokenStack[1]
 	  error(lineNumber, "Could not evaluate expression") unless tokenStack[0].match(/[a-z]/)
 	  if tokenStack.size > 2
-		puts "evaluate, tokenStack size:#{tokenStack.size}" if @debug
 	    error(lineNumber, "#{tokenStack.size - 1} elements left on stack" )
 	  end 
 	  @variables[newVar] = result # Put new variable into hash table
 	elsif tokenStack[0].is_a? String and tokenStack[0].match(/quit/)
+      # QUIT instruction
       exit
 	elsif tokenStack[0].is_a? String and tokenStack[0].match(/[^0-9a-z]/)
+      # INVALID instruction
       # Anything that isnt a number or letter
 	  error(lineNumber, "Invalid keyword #{tokenStack[0]}")
 	else
