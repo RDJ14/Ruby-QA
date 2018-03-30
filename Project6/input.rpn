@@ -1,0 +1,4 @@
+let b 2 1 -
+let a 4 3 +
+let c 5 2 +
+print c

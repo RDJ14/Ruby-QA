@@ -117,7 +117,7 @@ class Interpreter
       unless result.class < Numeric or result.match(/[a-z]/) # if result is some type of number
         error(lineNumber, "Invalid operand \"#{result}\"")
       end
-      result = @variables[result] if result.match(/[a-z]/) # Dereference variable
+	  result = @variables[result] if result.is_a? String and result.match(/[a-z]/) # Dereference variable
       if tokenStack.size > 2
 		puts "evaluate, tokenStack size:#{tokenStack.size}" if @debug
 	    error(lineNumber, "#{tokenStack.size - 1} elements left on stack" )
