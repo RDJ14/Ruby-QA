@@ -6,8 +6,9 @@ class TokenStack
     @variables = Hash.new
   end
   def push token
+    token.downcase! if token.is_a? String # Case insensitive program
     # Convert string numbers to normal numbers
-    token = token.to_i if token.is_a? String and token.match(/[0-9]/)
+    token = token.to_i if token.is_a? String and token.match?(/[[:digit:]]/)
     @stack.push(token)
   end
   def pop
