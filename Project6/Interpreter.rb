@@ -2,7 +2,7 @@ require_relative "TokenStack"
 
 class Interpreter
 
-  def initialize repl, args # For using RPN++ in repl mode
+  def initialize repl, filename # For using RPN++ in repl mode
     @debug = false
     @operators = ['+', '-', '/', '*']
     @keywords = ['print', 'let', 'quit']
@@ -13,7 +13,7 @@ class Interpreter
 	else
       # Read file array if we're REPLing
       # Throw error if the file arguments are invalid
-	  error("Invalid arguments") if (self.read_all_files(args)).nil?
+	  error("Invalid arguments") if self.read_file(filename).nil?
 	end
   end
 
@@ -24,15 +24,8 @@ class Interpreter
       end
   end
 
-  def read_all_files filename_array
-    return nil unless filename_array.is_a? Array
-    filename_array.each { |f|
-		error("File \"#{f}\" not found") unless File.exist?(f)
-		read_file(f) }
-  end
-
   def read_file filename
-    error("Arguments are not valid filenames") unless filename.is_a? String
+	error("File \"#{filename}\" not found") unless File.exist?(filename)
     file = File.open(filename,"r")
     stack = TokenStack.new # Variables and tokens are reset per file (program)
 	file.each_line {|line| break if line.empty?
@@ -43,7 +36,7 @@ class Interpreter
     line.split.each { |token| # Array-ified line
       unless (token.length == 1 and token.match?(/[[:alpha:]]/)) or token.match?(/[[:digit:]]+/) or @keywords.include? token  or @operators.include? token
         # The token is not a number, keyword, or single char
-        error(stack, lineNumber, "Unknown keyword #{token}")
+        error(4, stack, lineNumber, "Unknown keyword #{token}")
       end
 	  stack.push(token) # Push space-delimited tokens
       if @operators.include? stack.top
@@ -62,14 +55,14 @@ class Interpreter
 	op = stack.pop
 	rhs = stack.pop
 	lhs = stack.pop
-    error(stack, lineNumber, "#{stack.size} elements in stack after evaluation" ) unless @operators.include? op
-	error(stack, lineNumber, "Operator #{op} applied to empty stack") if lhs.nil? or rhs.nil?
+    error(3, stack, lineNumber, "#{stack.size} elements in stack after evaluation" ) unless @operators.include? op
+	error(2, stack, lineNumber, "Operator #{op} applied to empty stack") if lhs.nil? or rhs.nil?
     if rhs.is_a? String
-      error(stack, lineNumber, "Variable #{rhs} is not initialized") if stack.getVar(rhs).nil?
+      error(1, stack, lineNumber, "Variable #{rhs} is not initialized") if stack.getVar(rhs).nil?
       rhs = stack.getVar(rhs) # Dereference variable
     end
     if lhs.is_a? String
-      error(stack, lineNumber, "Variable #{lhs} is not initialized") if stack.getVar(lhs).nil?
+      error(1, stack, lineNumber, "Variable #{lhs} is not initialized") if stack.getVar(lhs).nil?
       lhs = stack.getVar(lhs) # Dereference variable
     end
 	case op
@@ -92,33 +85,33 @@ class Interpreter
     # should have been simplified by now
 	if stack.bottom.is_a? String and stack.bottom.eql?('print')
 	  # PRINT instruction
-      error(stack, lineNumber, "Operator PRINT applied to empty stack") if stack.size != 1
+      error(3, stack, lineNumber, "Operator PRINT applied to empty stack") if stack.size != 1
       result = stack.pop # should be stack[1]
       unless result.class < Numeric or result.match?(/[a-z]/) # if result is some type of number
-        error(stack, lineNumber, "Invalid operand \"#{result}\"")
+        error(5, stack, lineNumber, "Invalid operand \"#{result}\"")
       end
       result = stack.getVar(result) if result.is_a? String # Dereference variable
       if stack.size > 1
-	    error(stack, lineNumber, "#{stack.size} elements in stack after evaluation" )
+	    error(3, stack, lineNumber, "#{stack.size} elements in stack after evaluation" )
       end
       puts result if not @repl_mode
 	elsif stack.bottom.is_a? String and stack.bottom.eql?('let')
 	  # LET instruction
       result = stack.pop # stack[2]
-	  error(stack, lineNumber, "Operator LET applied to empty stack") if stack.size != 1
+	  error(3, stack, lineNumber, "Operator LET applied to empty stack") if stack.size != 1
 	  newVar = stack.pop # stack[1]
 	  if stack.size > 1
-	    error(stack, lineNumber, "#{stack.size} elements in stack after evaluation" )
+	    error(3, stack, lineNumber, "#{stack.size} elements in stack after evaluation" )
 	  end
       stack.addVar(newVar, result) # Put new variable into hash table
 	elsif stack.bottom.is_a? String and stack.bottom.eql?('quit')
       # QUIT instruction
       exit
 	else
-	  error(stack, lineNumber, "Could not evaluate expression") if stack.empty?
+	  error(5, stack, lineNumber, "Could not evaluate expression") if stack.empty?
       # If there isn't a keyword, then the bottom of the stack should
 	  # be a number 
-	  error(stack, lineNumber, "#{stack.size} elements in stack after evaluation") unless stack.size == 1
+	  error(3, stack, lineNumber, "#{stack.size} elements in stack after evaluation") unless stack.size == 1
       result = stack.bottom 
 	end
 	if @repl_mode == true
@@ -130,9 +123,9 @@ class Interpreter
     puts message
     exit
   end
-  def error stack, lineNumber, message
+  def error errorCode, stack, lineNumber, message
     puts "Line #{lineNumber}: " + message
-    exit unless @repl_mode
+    abort("Exit with error code:#{errorCode}") unless @repl_mode
     stack.reset # Clean up our stack
     repl(stack, lineNumber)
   end
