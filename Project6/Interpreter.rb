@@ -13,7 +13,7 @@ class Interpreter
 	else
       # Read file array if we're REPLing
       # Throw error if the file arguments are invalid
-	  error("Invalid arguments") if self.read_file(filename).nil?
+	  read_file(filename)
 	end
   end
 
@@ -28,8 +28,11 @@ class Interpreter
 	error("File \"#{filename}\" not found") unless File.exist?(filename)
     file = File.open(filename,"r")
     stack = TokenStack.new # Variables and tokens are reset per file (program)
-	file.each_line {|line| break if line.empty?
-         stackify_input(@lineNumber + 1, line, stack)} # Calls function per line
+	file.each_line {|line| 
+      # Calls function per line
+      @lineNumber = @lineNumber + 1
+      # line.lstrip.empty? Checks if there is any non-whitespace characters
+      stackify_input(@lineNumber, line, stack) unless line.lstrip.empty?}
   end
 
   def stackify_input lineNumber, line, stack

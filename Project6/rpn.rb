@@ -3,6 +3,7 @@ require_relative "Interpreter"
 # Main 
 Interpreter.new(true, nil) if ARGV.count == 0 # REPL mode
 
+File.delete('temp.rpn') if File.exists?('temp.rpn')
 tempFile = File.new('temp.rpn', 'a')
 File.open(tempFile, 'a') # Open in append mode
 
