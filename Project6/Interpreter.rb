@@ -41,7 +41,7 @@ class Interpreter
 
   def stackify_input lineNumber, line, stack
     line.split.each { |token| # Array-ified line
-      unless (token.length == 1 and token.match?(/[[:alnum:]]/))or @keywords.include? token  or @operators.include? token
+      unless (token.length == 1 and token.match?(/[[:alpha:]]/)) or token.match?(/[[:digit:]]+/) or @keywords.include? token  or @operators.include? token
         # The token is not a number, keyword, or single char
         error(stack, lineNumber, "Unknown keyword #{token}")
       end
