@@ -1,139 +1,158 @@
-require_relative "TokenStack"
+require_relative 'token_stack'
 
 class Interpreter
-
-  def initialize repl, args # For using RPN++ in repl mode
+  def initialize(repl, filename)
     @debug = false
     @operators = ['+', '-', '/', '*']
-    @keywords = ['print', 'let', 'quit']
-    @lineNumber = 0
+    @keywords = %w(print let quit)
+    @line_number = 0
     @repl_mode = repl
-	if repl
+    if repl
       repl(TokenStack.new, 0)
-	else
+    else
       # Read file array if we're REPLing
       # Throw error if the file arguments are invalid
-	  error("Invalid arguments") if (self.read_all_files(args)).nil?
-	end
+      read_file(filename)
+    end
   end
 
-  def repl stack, lineNumber
-      loop do
-        print "> " # Print avoids the newline
-        stackify_input(lineNumber + 1, gets.chomp, stack)
-      end
+  def repl(stack, line_number)
+    loop do
+      print '> ' # Print avoids the newline
+      stackify_input(line_number + 1, gets.chomp, stack)
+    end
   end
 
-  def read_all_files filename_array
-    return nil unless filename_array.is_a? Array
-    filename_array.each { |f|
-		error("File \"#{f}\" not found") unless File.exist?(f)
-		read_file(f) }
-  end
-
-  def read_file filename
-    error("Arguments are not valid filenames") unless filename.is_a? String
-    file = File.open(filename,"r")
+  def read_file(filename)
+    error("File \"#{filename}\" !found") unless File.exist?(filename)
+    file = File.open(filename, 'r')
     stack = TokenStack.new # Variables and tokens are reset per file (program)
-	file.each_line {|line| break if line.empty?
-         stackify_input(@lineNumber + 1, line, stack)} # Calls function per line
+    file.each_line do |line|
+      # Calls function per line
+      @line_number += 1
+      # line.lstrip.empty? Checks if there is any non-whitespace characters
+      stackify_input(@line_number, line, stack) unless line.lstrip.empty?
+    end
   end
 
-  def stackify_input lineNumber, line, stack
-    line.split.each { |token| # Array-ified line
-      unless token.match?(/[[:alnum:]]/) or @keywords.include? token  or @operators.include? token
+  def stackify_input(line_number, line, stack)
+    line.split.each do |token| # Array-ified line
+      unless (token.length == 1 && token.match?(/[[:alpha:]]/)) ||
+             token.match?(/[[:digit:]]+/) ||
+              @keywords.include?(token) ||
+             @operators.include?(token)
         # The token is not a number, keyword, or single char
-        error(stack, lineNumber, "Unknown keyword #{token}")
+        error(4, stack, line_number, "Unknown keyword #{token}")
       end
-	  stack.push(token) # Push space-delimited tokens
-      if @operators.include? stack.top
+      stack.push(token) # Push space-delimited tokens
+      if @operators.include?(stack.top)
         # Do binary op if we reached an operator
-		result = binary_operation(lineNumber, stack) # Push result onto top of stack
-	    stack.push(result)
-      end }
-    # Once binary operations are simplified, we can evaluate the stack
-    evaluate(lineNumber, stack) 
+        result = binary_operation(line_number, stack)
+        stack.push(result) # Push result onto top of stack
+      end
+    end
+    evaluate(line_number, stack)
     stack.reset # Reset since we're going to a new line
   end
 
-  def binary_operation lineNumber, stack
-    # Top of stack is an operator
-	# Second from top is RHS, third is LHS
-	op = stack.pop
-	rhs = stack.pop
-	lhs = stack.pop
-    error(stack, lineNumber, "#{stack.size} elements in stack after evaluation" ) unless @operators.include? op
-	error(stack, lineNumber, "Operator #{op} applied to empty stack") if lhs.nil? or rhs.nil?
-    if rhs.is_a? String
-      error(stack, lineNumber, "Variable #{rhs} is not initialized") if stack.getVar(rhs).nil?
-      rhs = stack.getVar(rhs) # Dereference variable
+  def binary_operation(line_number, stack)
+    op = stack.pop
+    rhs = stack.pop
+    lhs = stack.pop
+    unless @operators.include? op
+      error(3, stack, line_number,
+            "#{stack.size} elements in stack after evaluation")
     end
-    if lhs.is_a? String
-      error(stack, lineNumber, "Variable #{lhs} is not initialized") if stack.getVar(lhs).nil?
-      lhs = stack.getVar(lhs) # Dereference variable
+    if lhs.nil? || rhs.nil?
+      error(2, stack, line_number, "Operator #{op} applied to empty stack")
     end
-	case op
-	  when '+'
-		  result = lhs + rhs
-          puts "DEBUG: #{result} = #{lhs} + #{rhs}" if @debug
-	  when '-'
-		  result = lhs - rhs
-          puts "DEBUG: #{result} = #{lhs} - #{rhs}" if @debug
-	  when '/'
-		  result = lhs / rhs
-	  when '*'
-		  result = lhs * rhs
-	end
-	return result
-  end
-  
-  def evaluate lineNumber, stack
-	# Check for keywords here since binary operations 
-    # should have been simplified by now
-	if stack.bottom.is_a? String and stack.bottom.eql?('print')
-	  # PRINT instruction
-      error(stack, lineNumber, "Operator PRINT applied to empty stack") if stack.size != 1
-      result = stack.pop # should be stack[1]
-      unless result.class < Numeric or result.match?(/[a-z]/) # if result is some type of number
-        error(stack, lineNumber, "Invalid operand \"#{result}\"")
+    if rhs.is_a?(String)
+      if stack.get_var(rhs).nil?
+        error(1, stack, line_number, "Variable #{rhs} is not initialized")
       end
-      result = stack.getVar(result) if result.is_a? String # Dereference variable
-      if stack.size > 1
-	    error(stack, lineNumber, "#{stack.size} elements in stack after evaluation" )
+      rhs = stack.get_var(rhs) # Dereference variable
+    end
+    if lhs.is_a?(String) 
+      if stack.get_var(lhs).nil?
+        error(1, stack, line_number, "Variable #{lhs} is not initialized")
       end
-      puts result if not @repl_mode
-	elsif stack.bottom.is_a? String and stack.bottom.eql?('let')
-	  # LET instruction
-      result = stack.pop # stack[2]
-	  error(stack, lineNumber, "Operator LET applied to empty stack") if stack.size != 1
-	  newVar = stack.pop # stack[1]
-	  if stack.size > 1
-	    error(stack, lineNumber, "#{stack.size} elements in stack after evaluation" )
-	  end
-      stack.addVar(newVar, result) # Put new variable into hash table
-	elsif stack.bottom.is_a? String and stack.bottom.eql?('quit')
-      # QUIT instruction
-      exit
-	else
-	  error(stack, lineNumber, "Could not evaluate expression") if stack.empty?
-      # If there isn't a keyword, then the bottom of the stack should
-	  # be a number 
-	  error(stack, lineNumber, "#{stack.size} elements in stack after evaluation") unless stack.size == 1
-      result = stack.bottom 
-	end
-	if @repl_mode == true
-	  puts result # REPL output
-	end
+      lhs = stack.get_var(lhs) # Dereference variable
+    end
+    case op
+    when '+'
+      result = lhs + rhs
+    when '-'
+      result = lhs - rhs
+    when '/'
+      result = lhs / rhs
+    when '*'
+      result = lhs * rhs
+    end
+    return result
   end
 
-  def error  message
+  def evaluate(line_number, stack)
+    # Check for keywords here since binary operations
+    if (stack.bottom.is_a? String) && stack.bottom.eql?('print')
+      # PRINT instruction
+      if stack.size != 1
+        error(3, stack, line_number, 'Operator PRINT applied to empty stack')
+      end
+      result = stack.pop # should be stack[1]
+      unless result.class < Numeric ||
+             result.match?(/[a-z]/) # if result is some type of number
+        error(5, stack, line_number, "Invalid operand \"#{result}\"")
+      end
+      if result.is_a? String # Dereference variable
+        result = stack.get_var(result)
+      end
+      if stack.size > 1
+        error(3, stack, line_number,
+              "#{stack.size} elements in stack after evaluation")
+      end
+      puts result unless @repl_mode
+    elsif (stack.bottom.is_a? String) && stack.bottom.eql?('let')
+      # LET instruction
+      result = stack.pop # stack[2]
+      if stack.size != 1
+        error(3, stack, line_number,
+              'Operator LET applied to empty stack')
+      end
+      new_var = stack.pop # stack[1]
+      if stack.size > 1
+        error(3, stack, line_number,
+              "#{stack.size} elements in stack after evaluation")
+      end
+      stack.add_var(new_var, result) # Put new variable into hash table
+    elsif (stack.bottom.is_a? String) && stack.bottom.eql?('quit')
+      # QUIT instruction
+      exit
+    else
+      if stack.empty?
+        error(5, stack, line_number, 'Could not evaluate expression')
+      end
+      # If there isn't a keyword, then the bottom of the stack should
+      # be a number
+      unless stack.size == 1
+        error(3, stack, line_number,
+              "#{stack.size} elements in stack after evaluation")
+      end
+      result = stack.bottom
+    end
+    if @repl_mode == true
+      puts result # REPL output
+    end
+  end
+
+  def error(message)
     puts message
     exit
   end
-  def error stack, lineNumber, message
-    puts "Line #{lineNumber}: " + message
-    exit unless @repl_mode
+
+  def error(error_code, stack, line_number, message)
+    puts "Line #{line_number}: " + message
+    abort("Exit with error code:#{error_code}") unless @repl_mode
     stack.reset # Clean up our stack
-    repl(stack, lineNumber)
+    repl(stack, line_number)
   end
 end

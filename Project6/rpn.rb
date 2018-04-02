@@ -1,7 +1,7 @@
-require_relative 'Interpreter'
+require_relative 'interpreter'
 
 # Main
-Interpreter.new(true, nil) if ARGV.zero? # REPL mode
+Interpreter.new(true, nil) if ARGV.count.zero? # REPL mode
 
 File.delete('temp.rpn') if File.exist?('temp.rpn')
 temp_file = File.new('temp.rpn', 'a')
