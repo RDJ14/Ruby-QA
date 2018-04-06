@@ -1,4 +1,5 @@
 require_relative 'token_stack'
+require_relative 'rpn_lib'
 
 class Interpreter
   def initialize(repl, filename)
@@ -28,9 +29,7 @@ class Interpreter
 
   def stackify_input(line_number, line, stack)
     line.split.each do |token| # Array-ified line
-      unless (token.length == 1 && token.match?(/[[:alpha:]]/)) ||
-             token.match?(/[[:digit:]]+/) || @keywords.include?(token) ||
-             @operators.include?(token)
+      if RpnLib.unknown_keyword(token)
         # The token is not a number, keyword, or single char
         error(4, stack, line_number, "Unknown keyword #{token}")
       end
@@ -40,7 +39,6 @@ class Interpreter
       end
     end
     evaluate(line_number, stack)
-    stack.reset # Reset since we're going to a new line
   end
 
   def binary_operation(line_number, stack)
@@ -126,6 +124,7 @@ class Interpreter
       result = stack.bottom
     end
     puts result if @repl_mode == true
+    stack.reset # Reset since we're going to a new line
   end
 
   def error(message)
