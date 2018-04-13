@@ -1,50 +1,51 @@
+# Token Stack holds the stack of tokens read in
 class TokenStack
   def initialize
     @debug = false
-    @stack = Array.new
-    @keywords = ['print', 'let', 'quit']
-    @variables = Hash.new
+    @stack = Array[]
+    @keywords = %w[print let quit]
+    @variables = {}
   end
 
-  def push token
+  def push(token)
     token.downcase! if token.is_a? String # Case insensitive program
     # Convert string numbers to normal numbers
-    token = token.to_i if token.is_a? String and token.match?(/[[:digit:]]+/)
+    token = token.to_i if (token.is_a? String) && token.match?(/[[:digit:]]+/)
     @stack.push(token)
   end
 
   def pop
-    return @stack.pop
+    @stack.pop
   end
 
   def reset
-    @stack = Array.new
+    @stack = Array[]
   end
 
   def bottom
-    return @stack[0]
+    @stack[0]
   end
 
   def top
-    return @stack[-1]
+    @stack[-1]
   end
 
   def size
     # Count only NON keyword items
-    return @stack.count { |item| not @keywords.include? item }
+    @stack.count { |item| !@keywords.include? item }
   end
 
   def empty?
-      return self.size == 0 
+    size.zero?
   end
 
-  def add_var newVar, value
-    puts "DEBUG: adding var:#{newVar} w/ val:#{value}" if @debug
-    @variables[newVar] = value
+  def add_var(new_var, value)
+    puts "DEBUG: adding var:#{new_var} w/ val:#{value}" if @debug
+    @variables[new_var] = value
   end
 
-  def get_var var
+  def get_var(var)
     puts "DEBUG: returning var:#{var} w/ val:#{@variables[var]}" if @debug
-    return @variables[var]
+    @variables[var]
   end
 end

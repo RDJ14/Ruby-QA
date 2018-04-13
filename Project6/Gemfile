@@ -1,6 +1,6 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem "minitest"
-gem "simplecov"
-gem "rubocop"
-gem "reek"
+gem 'minitest'
+gem 'reek'
+gem 'rubocop'
+gem 'simplecov'
