@@ -7,6 +7,7 @@ class TokenStack
     @variables = {}
   end
   attr_accessor :stack
+  attr_accessor :variables
   def push(token)
     token.downcase! if token.is_a? String # Case insensitive program
     # Convert string numbers to normal numbers
