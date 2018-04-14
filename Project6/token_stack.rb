@@ -40,12 +40,10 @@ class TokenStack
   end
 
   def add_var(new_var, value)
-    puts "DEBUG: adding var:#{new_var} w/ val:#{value}" if @debug
     @variables[new_var] = value
   end
 
   def get_var(var)
-    puts "DEBUG: returning var:#{var} w/ val:#{@variables[var]}" if @debug
     @variables[var]
   end
 end
