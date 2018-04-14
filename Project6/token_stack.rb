@@ -6,7 +6,7 @@ class TokenStack
     @keywords = %w[print let quit]
     @variables = {}
   end
-
+  attr_accessor :stack
   def push(token)
     token.downcase! if token.is_a? String # Case insensitive program
     # Convert string numbers to normal numbers
