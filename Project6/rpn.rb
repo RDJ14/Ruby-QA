@@ -1,7 +1,10 @@
 require_relative 'interpreter'
 
 # Main
-Interpreter.new(true, nil) if ARGV.count.zero? # REPL mode
+if ARGV.count.zero? # REPL mode
+  interp = Interpreter.new(true, false)
+  interp.repl(0)
+end
 
 File.delete('temp.rpn') if File.exist?('temp.rpn')
 temp_file = File.new('temp.rpn', 'a')
@@ -15,5 +18,6 @@ ARGV.each do |f|
   # Offset is the size of the first file
   File.write(temp_file, opened_file.read, File.size(temp_file))
 end
-Interpreter.new(false, temp_file) # Runs on initialization
+interp = Interpreter.new(false, false) # Runs on initialization
+interp.read_file(temp_file)
 File.delete(temp_file)

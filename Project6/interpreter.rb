@@ -3,16 +3,16 @@ require_relative 'rpn_lib'
 
 # Interprets the input of the data
 class Interpreter
-  def initialize(repl, filename)
+  def initialize(repl, testing)
     @operators = ['+', '-', '/', '*']
     @keywords = %w[print let quit]
     @line_number = 0
     @repl_mode = repl
-    repl(TokenStack.new, 0) if repl
-    read_file(filename) unless repl
+    @test_mode = testing
   end
 
-  def repl(stack, line_number)
+  def repl(line_number)
+    stack = TokenStack.new
     loop do
       print '> ' # Print avoids the newline
       stackify_input(line_number + 1, gets.chomp, stack)
@@ -83,9 +83,11 @@ class Interpreter
     unless @operators.include? op
       error(3, stack, line_number,
             "#{stack.size} elements in stack after evaluation")
+      return 'Error'
     end
-    if lhs.nil? || rhs.nil?
-      error(2, stack, line_number, "Operator #{op} applied to empty stack")
+    if check_null_operation(lhs, rhs)
+      error(5, stack, line_number, 'Could not evaluate expression')
+      return 'Error'
     end
     rhs = verify_rhs(rhs, stack, line_number)
     lhs = verify_lhs(lhs, stack, line_number)
@@ -161,10 +163,12 @@ class Interpreter
   end
 
   def error(error_code, stack, line_number, message)
-    output = "Line #{line_number}: " + message + " \n"
-    abort(output + "Exit with error code:#{error_code}") unless @repl_mode
-    puts output
+    output = "Line #{line_number}: " + message + ' '
+    output += "Exit with error code:#{error_code}"
+    abort(output) unless @repl_mode || @test_mode
+    puts output unless @test_mode
     stack.reset # Clean up our stack
-    repl(stack, line_number)
+    repl(line_number) unless @test_mode
+    output
   end
 end
