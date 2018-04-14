@@ -127,7 +127,7 @@ class Interpreter
       error(3, stack, line_number, "#{size} elements in stack after evaluation")
     end
     stack.add_var(new_var, result) # Put new variable into hash table
-    print result
+    print result if @repl_mode == true
   end
 
   def evaluate(line_number, stack)
