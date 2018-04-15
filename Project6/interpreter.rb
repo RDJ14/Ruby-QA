@@ -118,9 +118,8 @@ class Interpreter
   end
 
   def evaluate(line_number, stack)
-    if stack.bottom.is_a?(String)
-      result = evaluate_string(line_number, stack)
-    else
+    result = evaluate_string(line_number, stack) if stack.bottom.is_a?(String)
+    unless stack.bottom.is_a?(String)
       result = evaluate_nonstring(line_number, stack)
     end
     puts result if @repl_mode == true
