@@ -104,6 +104,7 @@ class Interpreter
 
   def let_keyword(line_number, stack)
     result = stack.pop # stack[2]
+    result = stack.get_var(result) if result.is_a?(String)
     size = stack.size
     if size != 1
       error(3, stack, line_number, 'Operator LET applied to empty stack')
