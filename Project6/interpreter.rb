@@ -29,11 +29,9 @@ class Interpreter
 
   def stackify_input(line_number, line, stack)
     line.split.each do |token| # Array-ified line
-      unless stack.bottom.eql?('quit')
-        if RpnLib.unknown_keyword(token)
-          # The token is not a number, keyword, or single char
-          error(4, stack, line_number, "Unknown keyword #{token}")
-        end
+      if RpnLib.unknown_keyword(token)
+        # The token is not a number, keyword, or single char
+        error(4, stack, line_number, "Unknown keyword #{token}")
       end
       stack.push(token) # Push space-delimited tokens
       if @operators.include?(stack.top) # op at top of stack
