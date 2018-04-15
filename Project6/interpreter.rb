@@ -36,11 +36,14 @@ class Interpreter
         end
       end
       stack.push(token) # Push space-delimited tokens
-      if @operators.include?(stack.top) # op at top of stack
-        stack.push(binary_operation(line_number, stack)) # Push result on top
-      end
+      check_top(line_number, stack)
     end
     evaluate(line_number, stack)
+  end
+
+  def check_top(line_number, stack)
+    return nil unless @operators.include?(stack.top) # op at top of stack
+    stack.push(binary_operation(line_number, stack)) # Push result on top
   end
 
   def check_null_operation(lhs, rhs)
