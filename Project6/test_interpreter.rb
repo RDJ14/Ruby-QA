@@ -206,6 +206,4 @@ class TestInterpreter < Minitest::Test
 
     assert_equal 'Error', returned
   end
-
-  
 end
