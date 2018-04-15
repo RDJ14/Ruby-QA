@@ -81,7 +81,7 @@ class Interpreter
     # PRINT instruction
     size = stack.size
     if size != 1
-      error(3, stack, line_number,
+      error(2, stack, line_number,
             'Operator PRINT applied to empty stack')
       return 'Error'
     end
@@ -107,7 +107,7 @@ class Interpreter
     result = stack.get_var(result) if result.is_a?(String)
     size = stack.size
     if size != 1
-      error(3, stack, line_number, 'Operator LET applied to empty stack')
+      error(2, stack, line_number, 'Operator LET applied to empty stack')
     end
     new_var = stack.pop # stack[1]
     if size > 1
