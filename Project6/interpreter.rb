@@ -119,7 +119,7 @@ class Interpreter
 
   def evaluate(line_number, stack)
     if stack.bottom.is_a?(String)
-      evaluate_string(line_number, stack)
+      result = evaluate_string(line_number, stack)
     else
       result = evaluate_nonstring(line_number, stack)
     end
