@@ -1,9 +1,10 @@
 require_relative 'interpreter'
-
+require_relative 'token_stack'
 # Main
 if ARGV.count.zero? # REPL mode
   interp = Interpreter.new(true, false)
-  interp.repl(0)
+  stack = TokenStack.new
+  interp.repl(0, stack)
 end
 
 File.delete('temp.rpn') if File.exist?('temp.rpn')

@@ -11,8 +11,7 @@ class Interpreter
     @test_mode = testing
   end
 
-  def repl(line_number)
-    stack = TokenStack.new
+  def repl(line_number, stack)
     loop do
       print '> ' # Print avoids the newline
       stackify_input(line_number + 1, gets.chomp, stack)
@@ -156,7 +155,7 @@ class Interpreter
     puts(output) unless @test_mode
     exit(error_code) unless @repl_mode || @test_mode
     stack.reset # Clean up our stack
-    repl(line_number) unless @test_mode
+    repl(line_number, stack) unless @test_mode
     output
   end
 end
