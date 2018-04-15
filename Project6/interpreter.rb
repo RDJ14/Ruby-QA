@@ -48,32 +48,15 @@ class Interpreter
     true if lhs.nil? || rhs.nil?
   end
 
-  def check_rhs(rhs, stack)
-    true if rhs.is_a?(String) && stack.get_var(rhs).nil?
-  end
-
-  def check_lhs(lhs, stack)
-    true if lhs.is_a?(String) && stack.get_var(lhs).nil?
-  end
-
-  def verify_rhs(rhs, stack, line_number)
-    if rhs.is_a?(String)
-      if stack.get_var(rhs).nil?
-        error(1, stack, line_number, "Variable #{rhs} is not initialized")
+  def verify_arg(arg, stack, line_number)
+    if arg.is_a?(String)
+      if stack.get_var(arg).nil?
+        error(1, stack, line_number, "Variable #{arg} is not initialized")
+        return 'Error'
       end
-      rhs = stack.get_var(rhs) # Dereference variable
+      arg = stack.get_var(arg) # Dereference variable
     end
-    rhs
-  end
-
-  def verify_lhs(lhs, stack, line_number)
-    if lhs.is_a?(String)
-      if stack.get_var(lhs).nil?
-        error(1, stack, line_number, "Variable #{lhs} is not initialized")
-      end
-      lhs = stack.get_var(lhs) # Dereference variable
-    end
-    lhs
+    arg
   end
 
   def binary_operation(line_number, stack)
@@ -89,8 +72,8 @@ class Interpreter
       error(5, stack, line_number, 'Could not evaluate expression')
       return 'Error'
     end
-    rhs = verify_rhs(rhs, stack, line_number)
-    lhs = verify_lhs(lhs, stack, line_number)
+    rhs = verify_arg(rhs, stack, line_number)
+    lhs = verify_arg(lhs, stack, line_number)
     result = lhs.send(op, rhs)
     result
   end
@@ -101,19 +84,23 @@ class Interpreter
     if size != 1
       error(3, stack, line_number,
             'Operator PRINT applied to empty stack')
+      return 'Error'
     end
     result = stack.pop # should be stack[1]
     unless result.class < Numeric ||
            result.match?(/[a-z]/) # if result is some type of number
       error(5, stack, line_number, "Invalid operand \"#{result}\"")
+      return 'Error'
     end
     # Dereference variable
     result = stack.get_var(result) if result.is_a? String
     if size > 1
       error(3, stack, line_number,
             "#{size} elements in stack after evaluation")
+      return 'Error'
     end
     puts result unless @repl_mode
+    result
   end
 
   def let_keyword(line_number, stack)
@@ -153,14 +140,15 @@ class Interpreter
   def evaluate_nonstring(line_number, stack)
     if stack.empty?
       error(5, stack, line_number, 'Could not evaluate expression')
+      return 'Error'
     end
     # If there wasn't a keyword, stack bottom should be a number
     unless stack.size == 1
       error(3, stack, line_number,
             "#{stack.size} elements in stack after evaluation")
+      return 'Error'
     end
-    result = stack.bottom
-    result
+    stack.bottom # result of the operation
   end
 
   def error(error_code, stack, line_number, message)

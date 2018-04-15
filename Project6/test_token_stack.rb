@@ -3,7 +3,6 @@ require_relative 'token_stack'
 
 # Unit tests for token_stack.rb
 class TestTokenStack < Minitest::Test
-
   # Unit test for TokenStack::push(token)
   # Success case: token added to stack as either a String
   # or an Integer
