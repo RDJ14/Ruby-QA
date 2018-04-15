@@ -152,8 +152,7 @@ class Interpreter
   end
 
   def error(error_code, stack, line_number, message)
-    output = "Line #{line_number}: " + message + ' '
-    output += "Exit with error code:#{error_code}"
+    output = "Line #{line_number}: " + message
     abort(output) unless @repl_mode || @test_mode
     puts output unless @test_mode
     stack.reset # Clean up our stack

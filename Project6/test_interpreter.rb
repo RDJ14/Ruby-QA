@@ -81,7 +81,7 @@ class TestInterpreter < Minitest::Test
   # =>             Stack is not reset
   def test_error_normal
     stack = TokenStack.new
-    expected = 'Line 0: Testing Exit with error code:0'
+    expected = 'Line 0: Testing'
     terp = Interpreter.new(false, true)
     error = terp.error(0, stack, 0, 'Testing')
 
