@@ -153,8 +153,8 @@ class Interpreter
 
   def error(error_code, stack, line_number, message)
     output = "Line #{line_number}: " + message
-    abort(output) unless @repl_mode || @test_mode
-    puts output unless @test_mode
+    puts(output) unless @test_mode
+    exit(error_code) unless @repl_mode || @test_mode
     stack.reset # Clean up our stack
     repl(line_number) unless @test_mode
     output
