@@ -128,13 +128,14 @@ class Interpreter
       let_keyword(line_number, stack)
     elsif stack.bottom.eql?('quit')
       exit # QUIT instruction
+    else
+      error(5, stack, line_number, 'Could not evaluate expression')
+      'Error'
     end
   end
 
   def evaluate_nonstring(line_number, stack)
     if stack.empty?
-      error(5, stack, line_number, 'Could not evaluate expression')
-      return 'Error'
     end
     # If there wasn't a keyword, stack bottom should be a number
     unless stack.size == 1
