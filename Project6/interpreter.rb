@@ -86,11 +86,6 @@ class Interpreter
       return 'Error'
     end
     result = stack.pop # should be stack[1]
-    unless result.class < Numeric ||
-           result.match?(/[a-z]/) # if result is some type of number
-      error(5, stack, line_number, "Invalid operand \"#{result}\"")
-      return 'Error'
-    end
     # Dereference variable
     result = stack.get_var(result) if result.is_a? String
     if size > 1
